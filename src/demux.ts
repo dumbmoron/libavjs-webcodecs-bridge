@@ -24,7 +24,6 @@
 import type * as LibAVJS from "@libav.js/variant-webcodecs";
 import type * as LibAVJSWebCodecs from "libavjs-webcodecs-polyfill";
 declare let LibAV : LibAVJS.LibAVWrapper;
-declare let LibAVWebCodecs : any;
 declare let EncodedAudioChunk : any;
 declare let EncodedVideoChunk : any;
 
@@ -35,7 +34,8 @@ declare let EncodedVideoChunk : any;
  * @param stream  The stream to convert.
  */
 export async function audioStreamToConfig(
-    libav: LibAVJS.LibAV, stream: LibAVJS.Stream
+    libav: LibAVJS.LibAV, stream: LibAVJS.Stream,
+    hasPolyfill = false
 ): Promise<LibAVJSWebCodecs.AudioDecoderConfig> {
     const codecString = await libav.avcodec_get_name(stream.codec_id);
 
@@ -97,7 +97,7 @@ export async function audioStreamToConfig(
 
         default:
             // Best we can do is a libavjs-webcodecs-polyfill-specific config
-            if (typeof LibAVWebCodecs !== "undefined") {
+            if (hasPolyfill) {
                 ret.codec = {libavjs:{
                     codec: codecString,
                     ctx: {
@@ -123,7 +123,8 @@ export async function audioStreamToConfig(
  * @param stream  The stream to convert.
  */
 export async function videoStreamToConfig(
-    libav: LibAVJS.LibAV, stream: LibAVJS.Stream
+    libav: LibAVJS.LibAV, stream: LibAVJS.Stream,
+    hasPolyfill = false
 ): Promise<LibAVJSWebCodecs.VideoDecoderConfig> {
     const codecString = await libav.avcodec_get_name(stream.codec_id);
 
@@ -379,7 +380,7 @@ export async function videoStreamToConfig(
 
         default:
             // Best we can do is a libavjs-webcodecs-polyfill-specific config
-            if (typeof LibAVWebCodecs !== "undefined") {
+            if (hasPolyfill) {
                 ret.codec = {libavjs:{
                     codec: codecString,
                     ctx: {
